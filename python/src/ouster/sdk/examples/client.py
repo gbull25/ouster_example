@@ -332,12 +332,8 @@ def record_pcap(hostname: str,
                 n_seconds: int = 10) -> None:
     """Record data from live sensor to pcap file.
 
-    Note that pcap files recorded this way only preserve the UDP data stream and
-    not networking information, unlike capturing packets directly from a network
-    interface with tools like tcpdump or wireshark.
-
-    See the API docs of :py:func:`.pcap.record` for additional options for
-    writing pcap files.
+    Note that pcap files recorded this way are capturing packets directly from a network
+    interface with tcpdump.
 
     Args:
         hostname: hostname of the sensor
@@ -363,6 +359,16 @@ def record_pcap(hostname: str,
         print(f"Saving sensor metadata to: {fname_base}.json")
         source.write_metadata(f"{fname_base}.json")
 
+        """recording pcap files with tcpdump. 
+        -i key stands for interface (in our case Ethernet port on 2.5). 
+        -C key with the combination of -w key allow us to check whether
+        the file is currently larger than file_size and, if so,
+        close the current savefile and open a new one.
+        Savefiles after the first savefile will have the name 
+        specified with the -w flag, with a number after it, 
+        starting at 1 and continuing upward. The default unit 
+        of file_size is millions of bytes (1,000,000 bytes).
+        """
         print(f"Writing to: ouster_data.pcap (Ctrl-C to stop early)")
         os.system("tcpdump -i 2 -C 5000 -s 65535 -w ouster_data.pcap src 10.100.2.3")
         
