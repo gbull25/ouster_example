@@ -348,7 +348,8 @@ def record_pcap(hostname: str,
     """
     import ouster.pcap as pcap
     from datetime import datetime
-
+    import os
+    
     # [doc-stag-pcap-record]
     # connect to sensor and record lidar/imu packets
     with closing(client.Sensor(hostname, lidar_port, imu_port,
@@ -362,11 +363,9 @@ def record_pcap(hostname: str,
         print(f"Saving sensor metadata to: {fname_base}.json")
         source.write_metadata(f"{fname_base}.json")
 
-        print(f"Writing to: {fname_base}.pcap (Ctrl-C to stop early)")
-        source_it = time_limited(n_seconds, source)
-        n_packets = pcap.record(source_it, f"{fname_base}.pcap")
-
-        print(f"Captured {n_packets} packets")
+        print(f"Writing to: ouster_data.pcap (Ctrl-C to stop early)")
+        os.system("tcpdump -i 2 -C 5000 -s 65535 -w ouster_data.pcap src 10.100.2.3")
+        
     # [doc-etag-pcap-record]
 
 
